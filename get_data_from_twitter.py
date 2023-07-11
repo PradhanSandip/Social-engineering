@@ -29,7 +29,7 @@ max=500
 counter = 0
 
 #for each csv file
-for file_ in list(files)[400:500]:
+for file_ in list(files)[477:]:
     #if rate limit not reached
     if(counter < max):
         #get username
