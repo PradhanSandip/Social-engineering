@@ -47,11 +47,11 @@ def name_date_age_occupation(file_name, key):
     result["name"] = data["name"]
     if("Born" in data.keys()):
         born = data["Born"]
-        date_regex = re.compile("\d\d\d\d-\d\d-\d\d")
-        age_regex = re.compile("age \d\d")
+        date_regex = re.compile("\d{4}-\d{2}-\d{2}")
+        age_regex = re.compile("age \d{2}")
         search = (re.search(date_regex, born))
         if(search is not None):
-            result["dob"] = search.group()
+            result["dob"] = "-".join(search.group().split("-")[::-1])
         search = re.search(age_regex, born)
         if(search is not None):
             result["age"] = search.group().split(" ")[1]
