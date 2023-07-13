@@ -8,35 +8,13 @@ import os
 import json
 from pathlib import Path
 import time
+from parse_json import read_json, update_json
 #wikipedia api
 wiki = wikipediaapi.Wikipedia(f'CelebInfo/0 {os.environ.get("contact")}', "en")
 
 #json file to save celeb info
 save_file = "celeb-data.json"
 
-'''read and retun json file'''
-def read_json(file_name):
-    #if file does not exist
-    if(not Path(save_file).exists()):
-        #create file
-        with open(file_name, "w") as file:
-            #write data
-            file.write("{}")
-    #open file
-    with open(file_name, "r+") as file:
-        #return json data
-        return json.load(file)
-
-'''function to update and save json file'''
-def update_json(file_name, content):
-    #load json data of a file
-    data = read_json(file_name)
-    #update json
-    data.update(content)
-    #open json file
-    with open(file_name, "w") as file:
-        #save updated json 
-        json.dump(data, file)
 
 #remove emojis from the string
 def remove_emojis(data):
