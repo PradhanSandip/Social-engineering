@@ -71,7 +71,7 @@ def name_date_age_occupation(file_name, key):
         
     print(result)
 
-for key in read_json("celeb-data.json").keys():
-    name_date_age_occupation("celeb-data.json", key)
+# for key in read_json("celeb-data.json").keys():
+#     name_date_age_occupation("celeb-data.json", key)
 
 
