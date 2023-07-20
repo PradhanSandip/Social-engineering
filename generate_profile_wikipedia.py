@@ -171,15 +171,15 @@ def simple_search(name,username):
 #get all the tweeter profile
 celeb_list = pd.read_csv("extra-data.csv", sep=":::",engine="python")
 #for each profile
-for celeb in celeb_list.to_records():
-    #load the json file containing celeb data
-    data = read_json(save_file)
-    #if the json file does not contain celebrity with username
-    if(celeb["username"] not in data.keys()):
-        #retrieve data from wiki with name
-        simple_search(celeb["name"],celeb["username"])
-        #sleep for 1 sec
-        time.sleep(1)
+# for celeb in celeb_list.to_records():
+#     #load the json file containing celeb data
+#     data = read_json(save_file)
+#     #if the json file does not contain celebrity with username
+#     if(celeb["username"] not in data.keys()):
+#         #retrieve data from wiki with name
+#         simple_search(celeb["name"],celeb["username"])
+#         #sleep for 1 sec
+#         time.sleep(1)
     
 
 

@@ -28,13 +28,14 @@ def get_lateset_twitter_id(user):
 # # print(t)
 # # update_json("tweet-count.json", {"10Ronaldinho":t})
 
-'''
-#get users who has wiki data and tweets in english
-wiki_english_user = []
-for user in english_tweet_users:
-    if(user in wiki_data_users):
-        wiki_english_user.append(user)
 
+#get users who has wiki data and tweets in english
+# wiki_english_user = []
+# for user in english_tweet_users:
+#     if(user in wiki_data_users):
+#         wiki_english_user.append(user)
+
+'''
 # #creating json file to track tweet conunts 
 save_file = "tweet-count.json"
 #create json file
@@ -42,23 +43,35 @@ read_json(save_file)
 for english_user in english_tweet_users:
     tweet_count = pd.read_csv(f"english_only\\{english_user}.csv").shape[0]
     json_object = {}
-    json_object[english_user] = {"tweet_count": tweet_count, "additional_download": 0, "more_available": True}
+    json_object[english_user] = {"tweet_count": tweet_count, "additional_download": 0, "more_available": True, "twitter_id": ""}
     update_json(save_file, json_object)
 '''
 
-#go thoruh each user if user has less than 3000 tweets download more
+#go thorugh each user if user has less than 3000 tweets download more
 save_folder = "new_tweets/"
 config_data = read_json("tweet-count.json")
 config_data_keys = config_data.keys()
 
 for user in config_data_keys:
-    if(config_data[user]["tweet_count"] < 3000 and config_data[user]["more_available"] == True):
+    if(config_data[user]["more_available"] == True):
         print(user,end="\n##################################################################################################################################")
         save = save_folder+user+".csv"
-        user_id = client.get_user(username=user)
+        user_id = config_data[user]["twitter_id"] 
+        if(user_id == ""):
+            user_id = client.get_user(username=user)
+            if("data" in user_id.keys()):
+                user_id = user_id["data"]["id"]
+                json_data = read_json("tweet-count.json")[user]
+                json_data["twitter_id"] = user_id
+                update_json("tweet-count.json", {user:json_data})
+            else:
+                print("no profile")
+                json_data = read_json("tweet-count.json")[user]
+                json_data["more_available"] = False
+                update_json("tweet-count.json", {user:json_data})
         #retrive more tweets encoding = UTF-8
         most_recent_tweet_in_dataset = pd.read_csv(f"english_only/{user}.csv")["date"]
-        tweets = client.get_users_tweets(id=user_id["data"]["id"],max_results=100,since_id=get_lateset_twitter_id(user),tweet_fields=["id","text","created_at","lang"], user_auth =False)
+        tweets = client.get_users_tweets(id=user_id,max_results=100,since_id=get_lateset_twitter_id(user),tweet_fields=["id","text","created_at","lang"], user_auth =False)
         returned_tweets = []
         print(tweets)
         #if request is successful
@@ -68,7 +81,7 @@ for user in config_data_keys:
             json_data["additional_download"] += tweets["meta"]["result_count"]
             update_json("tweet-count.json", {user:json_data})
             print("no errors")
-        elif(tweets["meta"]["result_count"] == 0):
+        elif("errors" in tweets.keys() or tweets["meta"]["result_count"] == 0 or "data" not in tweets.keys()):
             print("no more new tweets")
             json_data = read_json("tweet-count.json")[user]
             json_data["more_available"] = False
@@ -85,10 +98,12 @@ for user in config_data_keys:
         print(returned_tweets)
         for tweet in returned_tweets:
             data.insert(0, {"twitter_id":tweet["id"], "date": tweet["created_at"], "tweet": tweet["text"].encode(), "lang": tweet["lang"]})
-           
+        
             print(tweet["created_at"], tweet["text"])
         new = pd.concat([pd.DataFrame(data), pd.read_csv(save)], ignore_index=True)
         new.to_csv(save, index=False)
+
+            
 
 
         
