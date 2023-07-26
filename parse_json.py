@@ -30,7 +30,7 @@ def update_json(file_name, content):
 
 '''retrive json by key'''
 def get_json_object_by_key(file_name, key):
-    return read_json(file_name)[key]
+    print(read_json(file_name)[key])
 
 '''print json in more readable form'''
 def print_json(file_name, key):

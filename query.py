@@ -65,7 +65,7 @@ for user in csv:
 
 total = 0
 missing = 0
-for key in t.keys():
+for key in celeb_data.keys():
     if(key in users):
         total += 1    
         if("dob" not in name_date_age_occupation(key).keys()):

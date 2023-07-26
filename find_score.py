@@ -52,7 +52,7 @@ def search_words(url, keywords):
 #find score for each profile
 for user in wiki_data.keys():
     print(user)
-    if(data[user]["score"] == 0): 
+    if("score" not in data[user].keys() or data[user]["score"] == 0): 
         current_user = twitter_profile[twitter_profile["username"] == user]
         name = current_user["name"].iloc[0]
         description = current_user["description"].iloc[0]
