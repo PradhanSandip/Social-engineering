@@ -15,6 +15,9 @@ def total_tweets_downloaded():
 
 
 
+
+
+
 '''get date of birth and age'''
 def name_date_age_occupation(key):
     file_name = "celeb-data.json"

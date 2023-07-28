@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 from parse_json import read_json
 import numpy as np
+import pandas as pd
 
 # wikipedia data
 wiki_data = read_json("celeb-data.json")
@@ -28,7 +29,7 @@ def count_english_profiles():
     plt.show()
 
 #dataset report
-count_english_profiles()
+# count_english_profiles()
 
 #draw bar char visiualising score based on keyword match in wikipedia
 def average_score():
@@ -52,6 +53,21 @@ def average_score():
     ax.bar_label(bars)
     plt.show()
 
-average_score()
+# average_score()
 
+def tweet_dob_calculation():
+    data = read_json("results.json")
+    profiles = len(list(Path("english_only").rglob("*.csv")))
+    others = len(pd.read_csv("incorrect-result.csv").to_records())
+    #draw bar char
+    x = np.array(["Total Profiles","Correct D.O.B calculated","Incorrect/D.O.B of other people"])
+    y = np.array([profiles, len(data.keys()), others])
+    fig, ax = plt.subplots()
+    ax.set_title("Date of birth from tweets")
+    bars = ax.bar(x,y, width=0.4, color="#33cccc")
+    # ax.set_xlim(-1,2)
+    ax.bar_label(bars)
+    plt.show()
+
+tweet_dob_calculation()
 
