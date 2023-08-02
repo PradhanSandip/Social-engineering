@@ -1,6 +1,6 @@
 import nltk
 import re
-from nltk import word_tokenize, pos_tag
+from nltk import word_tokenize, pos_tag, sent_tokenize
 from nltk.corpus import stopwords
 from nltk.probability import FreqDist
 import pandas as pd
@@ -8,7 +8,8 @@ from ast import literal_eval
 from generate_profile_wikipedia import remove_emojis
 from pathlib import Path
 from query import name_date_age_occupation
-from parse_json import update_json
+from parse_json import update_json, read_json
+
 
 target = "english_only\Alyssa_Milano.csv"
 stopwords = list(stopwords.words('english'))
@@ -64,12 +65,11 @@ def analyse_birthday(target):
                     tweet_date = re.search("\d{4}-\d{2}-\d{2}", data["date"].loc[index])
                     tweet_date = "-".join(tweet_date.group().split("-")[::-1])
                     calculated = calculate_age(tweet_age_found, tweet_date)
-                    if(calculated == n_d_a_o["dob"]):
-                        pass
-                        # print("Predicted: "+calculated)
-                        # print("DOB: "+n_d_a_o["dob"])
-                        # result = {n_d_a_o["name"]:{"calculated_dob": calculated, "wiki_dob": n_d_a_o["dob"], "mentions":context_result, "tweet":tweet}}
-                        # update_json(save_result, result)
+                    if(calculated[2:] == n_d_a_o["dob"][2:]):
+                        print("Predicted: "+calculated)
+                        print("DOB: "+n_d_a_o["dob"])
+                        result = {n_d_a_o["name"]:{"calculated_dob": calculated, "wiki_dob": n_d_a_o["dob"], "mentions":context_result, "tweet":tweet}}
+                        update_json(save_result, result)
                     else:
                         csv_data.append([file,n_d_a_o["name"], calculated, n_d_a_o["dob"], context_result, tweet.encode()])    
                         
@@ -115,34 +115,83 @@ def analyse_favorite(target):
     for index, tweet in enumerate(tweets):
         if(tweet.startswith('b')):
             tweet = remove_emojis(literal_eval(tweet).decode("UTF-8"))
-            tweet = re.sub("https://t.co+\w{10}", " ", tweet)
+            org = tweet
+            tweet = re.sub("(https|http)+(:|://)+(bit.ly+/\w{1,10}|(t.co+/\w{1,10}))", " ", tweet)
             tweet = re.sub("@\w+", "",tweet)
             tweet = re.sub("RT|'|/|[\"]","",tweet)
-            regex = re.compile("favorite")
-            result = re.search(regex, tweet)
-            if(result):
-                tweet_token = word_tokenize(tweet)
-                tweet_token = [word.lower() for word in tweet_token if word.lower() not in stopwords and len(word) > 2]
-                for token in tweet_token:
-                    tagger = pos_tag([token])
-                    if(tagger[0][1] == "NN"):
-                        word_list.append(token)
+            sentence = sent_tokenize(tweet)
+            for tweet in sentence:
+                regex = re.compile("favorite")
+                result = re.search(regex, tweet)
+                if(result):
+                    # print(tweet, " ==========================================================================> ",org+"  ##########")
+                    tweet_token = word_tokenize(tweet)
+                    tweet_token = [word.lower() for word in tweet_token if word.lower() not in stopwords and len(word) > 2]
+                    for token in tweet_token:
+                        if(token.startswith("http")):
+                            continue
+                            print(tweet, " ==========================================================================> ",org+"  ##########")
+                        tagger = pos_tag([token])
+                        if(tagger[0][1] == "NN"):
+                            word_list.append(token)
     FreqDist(word_list).pprint(maxlen=100, stream=None)
     print("------------------------------------------------------------------------------------------------------------------------------------------------------")
 
+def analyse_location(target):
+    data = pd.read_csv(target)
+    #tweets
+    tweets = data["tweet"]
+    reg = re.compile("Avenue |Lane|Road|Boulevard|Drive|Street|Ave|Dr|Rd|Blvd|Ln|St")
+    for index, tweet in enumerate(tweets):
+        if(tweet.startswith('b')):
+            tweet = remove_emojis(literal_eval(tweet).decode("UTF-8"))
+        result = re.search(reg, tweet)
+        if(result):
+            print(result, tweet)
+            print("==================================================================================")
 
-
-
-
+def predict_occupation(target):
+    print(target)
+    tracker = {}
+    data = pd.read_csv(target)
+    dictionary = read_json("occupation_dictionary.json")
+    #tweets
+    tweets = data["tweet"]
+    for index, tweet in enumerate(tweets):
+        if(tweet.startswith('b')):
+            tweet = remove_emojis(literal_eval(tweet).decode("UTF-8"))
+            words = word_tokenize(tweet)
+            for word in words:
+                tag = pos_tag([word])[0]
+                if((tag[1] == "NN" or tag[1] == "NNS") and len(tag[0]) > 2):
+                    word = tag[0]
+                    if(len(word) < 3):
+                        print(tag)
+                    for key in dictionary.keys():
+                        if(key in tracker.keys()):
+                            if(word not in tracker[key]["checked"] and word.lower() in dictionary[key]):
+                                
+                                tracker[key]["score"] += 1
+                                tracker[key]["checked"].append(word)
+                        else:
+                            if(word.lower() in dictionary[key]):
+                                tracker[key] = {"score":1,"checked":[word]}
+    score_dict = {key:tracker[key]["score"] for key in tracker.keys()}
+    print(dict(sorted(score_dict.items(), key=lambda item: item[1],reverse=True)))
+    
 if __name__ == "__main__":
     csvs = Path("english_only").rglob("*.csv")
     for csv in csvs:
         # analyse_birthday(csv)
         # analyse_occupation(csv)
-        analyse_favorite(csv)
+        # analyse_favorite(csv)
+        # analyse_location(csv)
+        predict_occupation(csv)
     csvs  = Path("new_tweets").rglob("*.csv")
     for csv in csvs:
         # analyse_birthday(csv)
         # analyse_occupation(csv)
-        analyse_favorite(csv)
+        # analyse_favorite(csv)
+        # analyse_location(csv)
+        predict_occupation(csv)
     # pd.DataFrame(csv_data).to_csv(incorrect_result, index=False, header=["id","name","calculated_dob","wiki_dob","mentions","tweet"])

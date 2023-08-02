@@ -60,7 +60,6 @@ def name_date_age_occupation(key):
             result["position"] = data["Position"]
         elif("Position(s)" in data.keys()):
             result["position"] = data["Position(s)"]
-            
         return result 
 
 if __name__ == "__main__":
@@ -73,10 +72,12 @@ if __name__ == "__main__":
     total = 0
     missing = 0
     for key in celeb_data.keys():
-        if(key in users):
-            total += 1    
-            if("dob" not in name_date_age_occupation(key).keys()):
-                print(key)
-                missing += 1
+        if("occupations" in name_date_age_occupation(key).keys()):
+            print(name_date_age_occupation(key)["occupations"])
+    #     if(key in users):
+    #         total += 1    
+    #         if("dob" not in name_date_age_occupation(key).keys()):
+    #             print(key)
+    #             missing += 1
 
-    print(total, missing)
+    # print(total, missing)

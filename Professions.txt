@@ -1,0 +1,53 @@
+###############Tv/Film#########################
+actor
+journalist
+chef
+stand up comedian
+artist
+talk show host
+writer
+television personality
+film maker
+film director
+celebrity
+television presenter
+media personality
+youtuber
+
+#######################Music######################
+rapper
+singer
+musician
+record producer
+song writer
+
+
+
+##################Public figures#################
+activist
+politician
+
+
+###########Fashon#################
+Model
+Fashon Designer
+
+
+################Sports#######
+footballer
+cricketer
+basetball player
+baseball player
+Professional skateboarder
+Racing driver
+
+##################Business#########################
+entrepreneur
+ceo 
+businessmen
+
+
+###################others#####################
+blogger
+vlogger
+
