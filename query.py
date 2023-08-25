@@ -49,17 +49,17 @@ def name_date_age_occupation(key):
                 result["age"] = search.group().split(" ")[1]
 
         if("Occupations" in data.keys()):
-            result["occupations"] = data["Occupations"]
+            result["occupation"] = data["Occupations"]
         elif("Occupation" in data.keys()):
-            result["occupations"] = data["Occupation"]
+            result["occupation"] = data["Occupation"]
         elif("Occupation(s)" in data.keys()):
-            result["occupations"] = data["Occupation(s)"]
+            result["occupation"] = data["Occupation(s)"]
         elif("Role" in data.keys()):
-            result["role"] = data["Role"]
+            result["occupation"] = data["Role"]
         elif("Position" in data.keys()):
-            result["position"] = data["Position"]
+            result["occupation"] = data["Position"]
         elif("Position(s)" in data.keys()):
-            result["position"] = data["Position(s)"]
+            result["occupation"] = data["Position(s)"]
         return result 
 
 if __name__ == "__main__":
